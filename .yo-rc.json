@@ -1,0 +1,106 @@
+{
+  "generator-nerdery": {
+    "title": "CLIENT.Project",
+    "name": "client-project",
+    "description": "Example project for Client.",
+    "version": "1.0.0",
+    "markup": "MarkupVanilla",
+    "styles": "StylesVanilla",
+    "scripts": "ScriptsRequireJs",
+    "framework": "FrameworkVanilla",
+    "scriptsVanillaNamespace": "NRD",
+    "nerderyBower": {
+      "dependencies": {
+        "requirejs": "2.1.9",
+        "nerdery-function-bind": "./tools/cache/nerdery-function-bind"
+      }
+    },
+    "nerderyCssLint": {},
+    "nerderyGrunt": {
+      "buildTask": [
+        "markup",
+        "styles",
+        "scripts"
+      ],
+      "copyConfig": [
+        "markup: {\n    files: [{\n        expand: true,\n        cwd: '<%= env.DIR_SRC %>',\n        dest: '<%= env.DIR_DEST %>',\n        src: ['**/*.html', '!assets/vendor/**']\n    }]\n}",
+        "styles: {\n    files: [{\n        expand: true,\n        cwd: '<%= env.DIR_SRC %>',\n        dest: '<%= env.DIR_DEST %>',\n        src: ['assets/{styles,vendor}/**/*.css']\n    }]\n}",
+        "scripts: {\n    files: [{\n        expand: true,\n        cwd: '<%= env.DIR_SRC %>',\n        dest: '<%= env.DIR_DEST %>',\n        /*jshint -W014 */\n        src: (grunt.option('maps') || grunt.option('no-dev'))\n           ? ['assets/scripts/config.js', 'assets/vendor/requirejs/require.js']\n           : ['assets/scripts/**/*.js', 'assets/vendor/**/*.js']\n        /*jshint +W014 */\n    }]\n}"
+      ],
+      "docsTask": [],
+      "initConfig": [
+        "\n// -- Style Tasks ------------------------------------------------------\n\ncssmin: {\n    options: {\n\n    }\n}",
+        "\n// -- Script Tasks -----------------------------------------------------\n\n// Bower plugin to automatically wire up bower modules into the\n// RequireJS config file.\nbower: {\n    main: {\n        // Path of shared configuration file\n        rjsConfig: '<%= env.DIR_SRC %>/assets/scripts/config.js'\n    }\n},\n\n// RequireJS plugin that will use uglify2 to build and minify our\n// JavaScript, templates and any other data we include in the require\n// files.\nrequirejs: {\n    options: {\n        // Path of source scripts, relative to this build file\n        baseUrl: '<%= env.DIR_SRC %>/assets/scripts',\n\n        // Whether to generate source maps for easier debugging of\n        // concatenated and minified code in the browser.\n        generateSourceMaps: grunt.option('maps'),\n\n        // Whether to preserve comments with a license. Not needed\n        // when, and incompatible with, generating a source map.\n        preserveLicenseComments: grunt.option('no-maps'),\n\n        // Allow `'use strict';` be included in the RequireJS files.\n        useStrict: true,\n\n        // Comments that start with //>> are build pragmas. Exmaple:\n        //\n        //     //>>includeStart(\"isDev\", pragmas.isDev);\n        //     ... debugging code here ...\n        //     //>>includeEnd(\"isDev\");\n        //\n        pragmas: {\n            isProd: grunt.option('prod'),\n            isStage: grunt.option('stage'),\n            isDev: grunt.option('dev')\n        },\n\n        // 'none' if you do not want to uglify\n        optimize: (grunt.option('maps') || grunt.option('no-dev')) ? 'uglify2' : 'none',\n\n        // Minification options\n        uglify2: {\n            output: {\n                beautify: false,\n                comments: false\n            },\n            compress: {\n                sequences: false,\n                global_defs: { // jshint ignore:line\n                    DEBUG: false\n                }\n            },\n            warnings: false,\n            mangle: true\n        }\n    },\n    main: {\n        options: {\n            // Path of shared configuration file\n            mainConfigFile: '<%= env.DIR_SRC %>/assets/scripts/config.js',\n\n            // Name of input script (.js extension inferred)\n            name: 'main',\n\n            // Path of final build script output\n            out: '<%= env.DIR_DEST %>/assets/scripts/main.js'\n        }\n    }\n}"
+      ],
+      "installTask": [
+        "bowerInstall",
+        "bower"
+      ],
+      "lintTask": [],
+      "registerTask": [
+        "grunt.registerTask('markup', ['copy:markup','usebanner:markup']);",
+        "if (grunt.option('dev')) {\n    grunt.registerTask('styles', ['copy:styles', 'usebanner:styles']);\n} else {\n    grunt.registerTask('styles', ['useminPrepare', 'concat', 'cssmin', 'usemin', 'usebanner:styles']);\n}",
+        "if (grunt.option('no-maps') || grunt.option('dev')) {\n    grunt.registerTask('scripts', ['copy:scripts', 'usebanner:scripts']);\n} else {\n    grunt.registerTask('scripts', ['requirejs:main', 'copy:scripts', 'usebanner:scripts']);\n}"
+      ],
+      "bannerConfig": [
+        "markup: {\n    options: {\n        banner: '<!--<%= banner %>-->\\n'\n    },\n    files: {\n        src: [ '<%= env.DIR_DEST %>/**/*.html' ]\n    }\n}",
+        "styles: {\n    options: {\n        banner: '/*!<%= banner %> */\\n'\n    },\n    files: {\n        src: [ '<%= env.DIR_DEST %>/assets/styles/**/*.css' ]\n    }\n}",
+        "scripts: {\n    options: {\n        banner: '/*!<%= banner %> */\\n'\n    },\n    files: {\n        src: [ '<%= env.DIR_DEST %>/assets/scripts/**/*.js' ]\n    }\n}"
+      ],
+      "watchConfig": [
+        "markup: {\n    files: ['<%= env.DIR_SRC %>/**/*.html'],\n    tasks: ['markup']\n}",
+        "styles: {\n    files: ['<%= env.DIR_SRC %>/assets/{styles,vendor}/**/*.css'],\n    tasks: ['styles']\n}",
+        "scripts: {\n    files: ['<%= env.DIR_SRC %>/assets/{scripts,vendor}/**/*.js'],\n    tasks: ['scripts']\n}"
+      ]
+    },
+    "nerderyJsHint": {
+      "globals": {
+        "requirejs": true,
+        "require": true,
+        "define": true
+      }
+    },
+    "nerderyPackage": {
+      "devDependencies": {
+        "grunt-bower-install": "1.0.0",
+        "grunt-contrib-concat": "0.3.0",
+        "grunt-contrib-cssmin": "0.7.0",
+        "grunt-usemin": "2.0.2",
+        "grunt-bower-requirejs": "0.7.1",
+        "grunt-contrib-requirejs": "0.4.1",
+        "karma-requirejs": "0.2.1"
+      }
+    },
+    "markupVanillaFeatures": {},
+    "markupContent": [],
+    "markupExtensionIn": "html",
+    "markupExtensionOut": "html",
+    "markupScripts": [
+      "<script src=\"assets/vendor/requirejs/require.js\"></script>\n<script src=\"assets/scripts/config.js\"></script>\n<script>\n    /**\n     * Global constants\n     *\n     * TODO: ideally these values would be filled in from the server side\n     *\n     * @class SETTINGS\n     * @static\n     */\n    window.SETTINGS = {};\n\n    /**\n     * Indicates whether we are running on a production environment\n     *\n     * @property IS_PRODUCTION\n     * @type Boolean\n     * @final\n     */\n    SETTINGS.IS_PRODUCTION = false;\n\n    /**\n     * Appended to query string for versioning of network resources (CSS,\n     * JavaScript, etc). This version number should be updated in production\n     * for every release.\n     *\n     * @property APP_VERSION\n     * @type {String}\n     * @final\n     */\n    SETTINGS.APP_VERSION = '<%= yo.version %>';\n\n     /**\n     * Set to true to allow application to output to browser console, false\n     * to silence all console output. This should be set to `false` on\n     * production.\n     *\n     * @property LOG_CONSOLE\n     * @type Boolean\n     * @final\n     */\n    SETTINGS.LOG_CONSOLE = !SETTINGS.IS_PRODUCTION;\n\n    /**\n     * Appended to query string to defeat caching of network resources (CSS,\n     * JavaScript, etc). Should be set to '' on production\n     *\n     * @property CACHE_BUSTER\n     * @type String\n     * @final\n     */\n    SETTINGS.CACHE_BUSTER = SETTINGS.IS_PRODUCTION ? '' : '&bust=' + Math.random();\n\n    /**\n     * Root path for all JavaScript files\n     *\n     * @property SCRIPT_PATH\n     * @type String\n     * @final\n     */\n    SETTINGS.SCRIPT_PATH = 'assets/scripts/';\n\n    /**\n     * Set any RequireJs configuration that is dependent on dynamic\n     * configuration variables. Note that this config data is merged into\n     * any other require.config() statements defined elsewhere.\n     */\n    require.config({\n        // Script path\n        baseUrl: SETTINGS.SCRIPT_PATH,\n\n        // Params to append to the end of each js file request\n        urlArgs: 'v=' + SETTINGS.APP_VERSION + SETTINGS.CACHE_BUSTER\n    });\n\n    /**\n     * Set route and kick off RequireJs, which begins loading of scripts\n     * starting from main.js.\n     */\n    require(['main']);\n</script>\n"
+    ],
+    "markupScriptsEntryPoint": "src/index.html",
+    "markupStyles": [
+      "<!-- build:css assets/styles/screen.css -->\n<!-- bower:css -->\n<!-- endbower -->\n<link rel=\"stylesheet\" media=\"screen, projection\" href=\"assets/styles/screen.css\" /><%\nyo.stylesImported.forEach(function(style) { %>\n<link rel=\"stylesheet\" media=\"screen, projection\" href=\"<%= style %>\" /><%\n}); %>\n<!-- endbuild --><%\nif (yo.stylesVanillaFeatures.ie9Conditional) { %>\n<!--[if IE 9]><link rel=\"stylesheet\" media=\"screen, projection\" href=\"assets/styles/ie9.css\" /><![endif]--><%\n}\nif (yo.stylesVanillaFeatures.ie8Conditional) { %>\n<!--[if lte IE 8]><link rel=\"stylesheet\" media=\"screen, projection\" href=\"assets/styles/ie8.css\" /><![endif]--><%\n}\nif (yo.stylesVanillaFeatures.ie7Conditional) { %>\n<!--[if lte IE 7]><link rel=\"stylesheet\" media=\"screen, projection\" href=\"assets/styles/ie7.css\" /><![endif]--><%\n}\nif (yo.stylesVanillaFeatures.print) { %>\n<link rel=\"stylesheet\" media=\"print\" href=\"assets/styles/print.css\" /><%\n} %>\n"
+    ],
+    "markupStylesEntryPoint": "src/index.html",
+    "stylesVanillaFeatures": {},
+    "stylesAlways": [],
+    "stylesImported": [],
+    "scriptsRequired": [
+      {
+        "as": "App",
+        "from": "assets/scripts/App.js",
+        "init": "window.app = new App();",
+        "resolved": "./App"
+      }
+    ],
+    "scriptsShimmed": [
+      {
+        "name": "nerdery-function-bind",
+        "exports": "nerderyFunctionBind",
+        "supportsAMD": true
+      }
+    ],
+    "frameworkVanillaFeatures": {}
+  }
+}

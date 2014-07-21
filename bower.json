@@ -1,0 +1,10 @@
+{
+  "name": "client-project",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "requirejs": "2.1.9",
+    "nerdery-function-bind": "./tools/cache/nerdery-function-bind"
+  },
+  "devDependencies": {}
+}
